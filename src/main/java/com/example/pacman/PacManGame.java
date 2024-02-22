@@ -6,7 +6,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
@@ -16,6 +17,7 @@ import java.util.logging.Logger;
 public class PacManGame extends Application {
 
     private PacMan pacMan;
+    private List<Rectangle> walls = new ArrayList<>(); // skal holde alle veggene i listen
     private static final Logger LOGGER = Logger.getLogger(PacManGame.class.getName());
 
 
@@ -54,17 +56,19 @@ public class PacManGame extends Application {
                     char ch = line.charAt(x);
                     switch (ch) {
                         case 'X':
-                            Rectangle wall = new Rectangle(x * 20, y * 20, 20, 20);
+                            Rectangle wall = new Rectangle(x * 40, y * 40, 40, 40);
                             root.getChildren().add(wall);
+                            walls.add(wall); // setter alle veggene på mappet
                             break;
                         case '.':
-                            Circle dot = new Circle(x * 20 + 10, y * 20 + 10, 5);
+                            Circle dot = new Circle(x * 40 + 20, y * 40 + 20, 5);
                             root.getChildren().add(dot);
                             break;
                         case 'P':
                             // initierer pacman her
                             pacMan = new PacMan(root);
-                            pacMan.setPosition(x * 20 + 10, y * 20 + 10);
+                            pacMan.setPosition(x * 40 + 20, y * 40 + 20);
+                            pacMan.setWalls(walls);
                             break;
 
                     }
