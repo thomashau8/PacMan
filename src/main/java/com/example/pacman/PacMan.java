@@ -1,21 +1,34 @@
 package com.example.pacman;
 
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Arc;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.ArcType;
+import javafx.animation.KeyFrame;
+import javafx.util.Duration;
 
 import java.util.List;
 
 public class PacMan {
     // PacMan's sine attributes
-    private Circle pacManFigure;
+    private Arc pacManFigure;
     private int lives = 3;
     private int score = 0;
     private List<Rectangle> walls;
-
     public PacMan(Pane root) {
-        pacManFigure = new Circle(15);
+        // Byttet om fra circle til arc for å kunne animere munn åpning
+        pacManFigure = new Arc();
+        pacManFigure.setRadiusX(13);
+        pacManFigure.setRadiusY(13);
+        pacManFigure.setLength(360);
+        pacManFigure.setType(ArcType.ROUND);
+        pacManFigure.setFill(Color.YELLOW);
+
         root.getChildren().add(pacManFigure);
     }
 
@@ -59,6 +72,7 @@ public class PacMan {
             pacManFigure.setCenterX(originalX);
             pacManFigure.setCenterY(originalY);
         }
+
     }
 
     public void setPosition(double x, double y) {

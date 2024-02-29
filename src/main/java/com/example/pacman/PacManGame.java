@@ -3,6 +3,7 @@ package com.example.pacman;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -25,7 +26,7 @@ public class PacManGame extends Application {
     @Override
     public void start(Stage primaryStage) {
         Pane root = new Pane();
-        Scene scene = new Scene(root, 1200, 800);
+        Scene scene = new Scene(root, 960, 640, Color.BLACK);
 
         // initierer mappet fra tekst fil
         loadMap(root, "map.txt");
@@ -46,6 +47,7 @@ public class PacManGame extends Application {
             LOGGER.log(Level.SEVERE, "Could not find resource file: {0}", mapFileName);
             return;
         }
+
         // wrapper inputstream med bufferedReader for å lese tekst fra inputstream
         try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             String line; // for å holde linjene
@@ -56,18 +58,22 @@ public class PacManGame extends Application {
                     char ch = line.charAt(x);
                     switch (ch) {
                         case 'X':
-                            Rectangle wall = new Rectangle(x * 40, y * 40, 40, 40);
+                            Rectangle wall = new Rectangle(x * 32, y * 32, 32, 32);
+                            wall.setFill(Color.BLUE);
+                            wall.setStroke(Color.DARKBLUE);
+
                             root.getChildren().add(wall);
                             walls.add(wall); // setter alle veggene på mappet
                             break;
                         case '.':
-                            Circle dot = new Circle(x * 40 + 20, y * 40 + 20, 5);
+                            Circle dot = new Circle(x * 32 + 16, y * 32 + 16, 4.5);
+                            dot.setFill(Color.YELLOW);
                             root.getChildren().add(dot);
                             break;
                         case 'P':
                             // initierer pacman her
                             pacMan = new PacMan(root);
-                            pacMan.setPosition(x * 40 + 20, y * 40 + 20);
+                            pacMan.setPosition(x * 32 + 16, y * 32 + 16);
                             pacMan.setWalls(walls);
                             break;
 
