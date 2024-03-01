@@ -61,14 +61,16 @@ public class PacManGame extends Application {
                             Rectangle wall = new Rectangle(x * 32, y * 32, 32, 32);
                             wall.setFill(Color.BLUE);
                             wall.setStroke(Color.DARKBLUE);
-
                             root.getChildren().add(wall);
                             walls.add(wall); // setter alle veggene på mappet
                             break;
                         case '.':
-                            Circle dot = new Circle(x * 32 + 16, y * 32 + 16, 4.5);
-                            dot.setFill(Color.YELLOW);
-                            root.getChildren().add(dot);
+                            Food food  = new Food(x * 32 + 16, y * 32 + 16);
+                            root.getChildren().add(food.getVisual());
+                            break;
+                        case '0':
+                            PowerUps powerUp = new PowerUps(x * 32 + 16, y * 32 + 16);
+                            root.getChildren().add(powerUp.getVisual());
                             break;
                         case 'P':
                             // initierer pacman her
