@@ -2,6 +2,7 @@ package com.example.pacman;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -19,8 +20,8 @@ public class PacManGame extends Application {
 
     private PacMan pacMan;
     private List<Rectangle> walls = new ArrayList<>(); // skal holde alle veggene i listen
+    private List<Collectible> collectibles = new ArrayList<>(); // holder alle collectibles
     private static final Logger LOGGER = Logger.getLogger(PacManGame.class.getName());
-
 
 
     @Override
@@ -31,7 +32,10 @@ public class PacManGame extends Application {
         // initierer mappet fra tekst fil
         loadMap(root, "map.txt");
 
-        scene.setOnKeyPressed(e -> pacMan.move(e.getCode()));
+        scene.setOnKeyPressed(e -> pacMan.setCurrentDirection(e.getCode()));
+
+        gameLoop loop = new gameLoop(pacMan, collectibles, root);
+        loop.start();
 
         primaryStage.setTitle("Pac-Man");
         primaryStage.setScene(scene);
@@ -67,10 +71,12 @@ public class PacManGame extends Application {
                         case '.':
                             Food food  = new Food(x * 32 + 16, y * 32 + 16);
                             root.getChildren().add(food.getVisual());
+                            collectibles.add(food); // addes til listen
                             break;
                         case '0':
                             PowerUps powerUp = new PowerUps(x * 32 + 16, y * 32 + 16);
                             root.getChildren().add(powerUp.getVisual());
+                            collectibles.add(powerUp); // addes de til listen
                             break;
                         case 'P':
                             // initierer pacman her
