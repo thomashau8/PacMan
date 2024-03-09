@@ -2,6 +2,7 @@ package com.example.pacman;
 
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
@@ -13,6 +14,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.ArcType;
 import javafx.animation.KeyFrame;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 import java.security.Key;
@@ -25,6 +27,8 @@ public class PacMan {
     private Arc pacManFigure;
     private int lives = 3;
     private int score = 0;
+    private Text scoreText;
+    private Text livesText;
     private double speed = 2.0;
     private boolean powerMode = false;
     private List<Rectangle> walls;
@@ -34,7 +38,9 @@ public class PacMan {
     // metode for å hjelpe spiller å turne selv om tasten blir trykket ved en vegg
 
 
-    public PacMan(Pane root) {
+    public PacMan(Pane gamePane, Text scoreText, Text livesText) {
+        this.scoreText = scoreText;
+        this.livesText = livesText;
         // Byttet om fra circle til arc for å kunne animere munn åpning
         pacManFigure = new Arc();
         pacManFigure.setRadiusX(14);
@@ -43,7 +49,9 @@ public class PacMan {
         pacManFigure.setType(ArcType.ROUND);
         pacManFigure.setFill(Color.YELLOW);
 
-        root.getChildren().add(pacManFigure);
+        gamePane.getChildren().add(pacManFigure);
+        updateScoreDisplay();
+        updateLivesDisplay();
     }
 
     // gir PacMan klassen tilgang til alle veggene på mappet for å sjekke collision
@@ -74,7 +82,21 @@ public class PacMan {
     // metode for å sette score
     public void addScore(int points) {
         this.score += points;
-        // implementer score display senere
+        updateScoreDisplay();
+    }
+
+    // metode for å tracke liv
+    public void loseLife() {
+        this.lives--;
+        updateLivesDisplay();
+    }
+
+    private void updateScoreDisplay() {
+        Platform.runLater(() -> scoreText.setText("Score: " + score));
+    }
+
+    private void updateLivesDisplay() {
+        Platform.runLater(() -> livesText.setText("Lives: " + lives));
     }
 
     // metode for powermode

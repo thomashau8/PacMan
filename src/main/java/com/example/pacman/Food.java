@@ -14,15 +14,13 @@ public class Food implements Collectible {
 
     @Override
     public void collect(PacMan pacMan) {
-//        pacMan.addScore(10);  må implementeres
-
-//        visual.setVisible(false); fjernes etter interaksjon
+        visual.setVisible(false); // fjernes etter kollisjon
+        pacMan.addScore(10); // adder poeng til score
     }
 
     @Override
     public Node getVisual() {
         return visual;
     }
-
 
 }

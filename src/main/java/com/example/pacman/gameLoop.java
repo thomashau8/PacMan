@@ -10,14 +10,13 @@ import java.util.List;
 public class gameLoop extends AnimationTimer {
     private PacMan pacMan;
     private List<Collectible> collectibles;
-    private Pane root;
+    private Pane gamePane;
 
-    public gameLoop(PacMan pacMan, List<Collectible> collectibles, Pane root) {
+    public gameLoop(PacMan pacMan, List<Collectible> collectibles, Pane gamePane) {
         this.pacMan = pacMan;
         this.collectibles = collectibles;
-        this.root = root;
+        this.gamePane = gamePane;
     }
-
 
 
     @Override
@@ -26,6 +25,7 @@ public class gameLoop extends AnimationTimer {
         collectibleCollision(collectibles);
     }
 
+    // Metode som kaller collect hver gang pacman kommer i kontakt med fysiske ting på mappet
     public void collectibleCollision(List<Collectible> collectibles) {
         Iterator<Collectible> iterator = collectibles.iterator();
         while (iterator.hasNext()) {
@@ -33,7 +33,7 @@ public class gameLoop extends AnimationTimer {
             Node visual = collectible.getVisual();
             if (pacMan.getBounds().intersects(visual.getBoundsInParent())) {
                 collectible.collect(pacMan); // "this" referer til current pacman instanse
-                root.getChildren().remove(collectible.getVisual()); // remover visuel representasjon i spillet
+                gamePane.getChildren().remove(collectible.getVisual()); // remover visuel representasjon i spillet
                 iterator.remove(); // remover "collectible" som pacman kom i kontakt med fra listen.
             }
         }
