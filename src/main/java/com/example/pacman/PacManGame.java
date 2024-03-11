@@ -28,6 +28,8 @@ public class PacManGame extends Application {
   // hvis tid  private Text highScoreText = new Text("High Score: 0");
     private Text scoreText = new Text("Score: 0");
     private Text livesText = new Text("Lives: 3");
+    private int currerntLevel = 1;
+    private Text levelText = new Text("Level: 1");
 
 
     @Override
@@ -48,6 +50,9 @@ public class PacManGame extends Application {
         // gamePane holder game elementene
         Pane gamePane = new Pane();
 
+        pacMan = new PacMan(gamePane, scoreText, livesText);
+        pacMan.setWalls(walls);
+
         // initierer mappet fra tekst fil
         loadMap(gamePane, "map.txt");
 
@@ -58,7 +63,7 @@ public class PacManGame extends Application {
         Scene scene = new Scene(root, 735, 880, Color.BLACK);
         scene.setOnKeyPressed(e -> pacMan.setCurrentDirection(e.getCode()));
 
-        gameLoop loop = new gameLoop(pacMan, collectibles, root);
+        gameLoop loop = new gameLoop(this, pacMan, collectibles, gamePane);
         loop.start();
 
         primaryStage.setTitle("Pac-Man");
@@ -93,7 +98,7 @@ public class PacManGame extends Application {
                             walls.add(wall); // setter alle veggene på mappet
                             break;
                         case '.':
-                            Food food  = new Food(x * 32 + 16, y * 32 + 16);
+                            Food food = new Food(x * 32 + 16, y * 32 + 16);
                             gamePane.getChildren().add(food.getVisual());
                             collectibles.add(food); // addes til listen
                             break;
@@ -104,9 +109,7 @@ public class PacManGame extends Application {
                             break;
                         case 'P':
                             // initierer pacman her
-                            pacMan = new PacMan(gamePane, scoreText, livesText);
                             pacMan.setPosition(x * 32 + 16, y * 32 + 16);
-                            pacMan.setWalls(walls);
                             break;
 
                     }
@@ -117,7 +120,6 @@ public class PacManGame extends Application {
             LOGGER.log(Level.SEVERE, "Error reading file: " + mapFileName, e);
         }
     }
-
 
 
     public static void main(String[] args) {

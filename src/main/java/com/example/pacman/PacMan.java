@@ -1,26 +1,20 @@
 package com.example.pacman;
 
-import javafx.animation.KeyValue;
+import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
-import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.ArcType;
-import javafx.animation.KeyFrame;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
-
-import java.security.Key;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
+import static javafx.scene.paint.Color.*;
 
 public class PacMan {
     // PacMan's sine attributes
@@ -29,13 +23,15 @@ public class PacMan {
     private int score = 0;
     private Text scoreText;
     private Text livesText;
-    private double speed = 2.0;
     private boolean powerMode = false;
     private List<Rectangle> walls;
     private KeyCode currentDirection = KeyCode.RIGHT; // må visst ha en variabel for å kunne ha pacman gående
     private KeyCode desiredDirection = KeyCode.RIGHT;
     private double movementAssistance = 2; // det er veldig vanskelig å navigere så vi implementerer en slags "lookahead" -
     // metode for å hjelpe spiller å turne selv om tasten blir trykket ved en vegg
+    private static final double TUNNEL_LEFT = 0;
+    private static final double TUNNEL_RIGHT = 735; // samme some game width
+    private Timeline powerModeTimer;
 
 
     public PacMan(Pane gamePane, Text scoreText, Text livesText) {
@@ -43,8 +39,8 @@ public class PacMan {
         this.livesText = livesText;
         // Byttet om fra circle til arc for å kunne animere munn åpning
         pacManFigure = new Arc();
-        pacManFigure.setRadiusX(14);
-        pacManFigure.setRadiusY(14);
+        pacManFigure.setRadiusX(14.5);
+        pacManFigure.setRadiusY(14.5);
         pacManFigure.setLength(360);
         pacManFigure.setType(ArcType.ROUND);
         pacManFigure.setFill(Color.YELLOW);
@@ -60,19 +56,16 @@ public class PacMan {
     }
 
     // sjekker om pacman's bounding box intersects med bounding boxen til veggene
-    public boolean wallCollision(double x, double y) {
-        Bounds currentBounds = pacManFigure.getBoundsInParent();
-
-        double offsetX = x - pacManFigure.getCenterX();
-        double offsetY = y - pacManFigure.getCenterY();
-
+    public boolean wallCollision(double nextX, double nextY) {
         Bounds potentialBounds = new BoundingBox(
-                currentBounds.getMinX() + offsetX, currentBounds.getMinY() + offsetY,
-                currentBounds.getWidth(), currentBounds.getHeight()
+                nextX - pacManFigure.getRadiusX(),
+                nextY - pacManFigure.getRadiusY(),
+                pacManFigure.getRadiusX() * 2,
+                pacManFigure.getRadiusY() * 2
         );
 
         for (Rectangle wall : walls) {
-            if (wall.getBoundsInParent().intersects(potentialBounds)) {
+            if (potentialBounds.intersects(wall.getBoundsInParent())) {
                 return true;
             }
         }
@@ -102,17 +95,24 @@ public class PacMan {
     // metode for powermode
     public void enablePowerMode() {
         this.powerMode = true;
-        // start timer - senere implementasjon
+        pacManFigure.setFill(RED);
+
+        if ( powerModeTimer != null) {
+            powerModeTimer.stop();
+        }
+        powerModeTimer = new Timeline(new KeyFrame(Duration.seconds(10), e -> disablePowerMode()));
+        powerModeTimer.play();
         // handle ghost state senere
     }
 
     public void disablePowerMode() {
         this.powerMode = false;
+        pacManFigure.setFill(YELLOW);
     }
 
     // holder pacman's orginal posisjon, og etter move forsøk sjekker om man koliderer med en vegg
-    public void move() {
-        // sjekker om vi kan snu valgt direction
+    public void move(double currentSpeed) {
+        // sjekker om vi kan snu til valgt direction
         if (canTurn(desiredDirection)) {
             currentDirection = desiredDirection;
         }
@@ -120,16 +120,16 @@ public class PacMan {
         double offsetX = 0, offsetY = 0;
         switch (currentDirection) {
             case UP:
-                offsetY = -speed;
+                offsetY = -currentSpeed;
                 break;
             case DOWN:
-                offsetY = speed;
+                offsetY = currentSpeed;
                 break;
             case LEFT:
-                offsetX = -speed;
+                offsetX = -currentSpeed;
                 break;
             case RIGHT:
-                offsetX = speed;
+                offsetX = currentSpeed;
                 break;
         }
         // gjør det faktiske movementet
@@ -140,8 +140,14 @@ public class PacMan {
         if (wallCollision(pacManFigure.getCenterX(), pacManFigure.getCenterY())) {
             pacManFigure.setCenterX(pacManFigure.getCenterX() - offsetX);
             pacManFigure.setCenterY(pacManFigure.getCenterY() - offsetY);
+        } else {
+            // sjekker om pacman går gjennom en tunnel og teleporterer til andre side
+            if (pacManFigure.getCenterX() < TUNNEL_LEFT) {
+                pacManFigure.setCenterX(TUNNEL_RIGHT);
+            } else if (pacManFigure.getCenterX() > TUNNEL_RIGHT) {
+                pacManFigure.setCenterX(TUNNEL_LEFT);
+            }
         }
-
     }
 
     public boolean canTurn(KeyCode direction) {
@@ -150,10 +156,14 @@ public class PacMan {
         double lookaheadY = pacManFigure.getCenterY();
 
         switch (direction) {
-            case UP: lookaheadY -= movementAssistance; break;
-            case DOWN: lookaheadY += movementAssistance; break;
-            case LEFT: lookaheadX -= movementAssistance; break;
-            case RIGHT: lookaheadX += movementAssistance; break;
+            case UP: lookaheadY -= movementAssistance;
+            break;
+            case DOWN: lookaheadY += movementAssistance;
+            break;
+            case LEFT: lookaheadX -= movementAssistance;
+            break;
+            case RIGHT: lookaheadX += movementAssistance;
+            break;
         }
 
         // sjekk om det er en vegg på lookahead posisjon
@@ -173,4 +183,5 @@ public class PacMan {
         pacManFigure.setCenterX(x);
         pacManFigure.setCenterY(y);
     }
+
 }

@@ -25,6 +25,7 @@ public class PowerUps implements Collectible {
         pacMan.addScore(500);
        // pacMan.enablePowerMode(); // må implementeres
         visual.setVisible(false); // fjernes etter kollisjon
+        pacMan.enablePowerMode();
     }
 
     @Override
