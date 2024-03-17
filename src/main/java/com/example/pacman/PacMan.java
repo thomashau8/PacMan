@@ -17,7 +17,8 @@ import java.util.List;
 import static javafx.scene.paint.Color.*;
 
 public class PacMan {
-    // PacMan's sine attributes
+    // byttet fra circle til arc for å animere pacman, men tror ikke jeg rekker det
+    private List<Ghosts> ghosts;
     private Arc pacManFigure;
     private int lives = 3;
     private int score = 0;
@@ -29,14 +30,13 @@ public class PacMan {
     private KeyCode desiredDirection = KeyCode.RIGHT;
     private double movementAssistance = 2; // det er veldig vanskelig å navigere så vi implementerer en slags "lookahead" -
     // metode for å hjelpe spiller å turne selv om tasten blir trykket ved en vegg
-    private static final double TUNNEL_LEFT = 0;
-    private static final double TUNNEL_RIGHT = 735; // samme some game width
     private Timeline powerModeTimer;
 
 
-    public PacMan(Pane gamePane, Text scoreText, Text livesText) {
+    public PacMan(Pane gamePane, Text scoreText, Text livesText, List<Ghosts> ghosts) {
         this.scoreText = scoreText;
         this.livesText = livesText;
+        this.ghosts = ghosts;
         // Byttet om fra circle til arc for å kunne animere munn åpning
         pacManFigure = new Arc();
         pacManFigure.setRadiusX(14.5);
@@ -95,19 +95,25 @@ public class PacMan {
     // metode for powermode
     public void enablePowerMode() {
         this.powerMode = true;
-        pacManFigure.setFill(RED);
+        pacManFigure.setFill(PURPLE);
+        for (Ghosts ghost : ghosts) {
+            ghost.scared();
 
         if ( powerModeTimer != null) {
             powerModeTimer.stop();
         }
-        powerModeTimer = new Timeline(new KeyFrame(Duration.seconds(10), e -> disablePowerMode()));
+        powerModeTimer = new Timeline(new KeyFrame(Duration.seconds(5), e -> disablePowerMode()));
         powerModeTimer.play();
-        // handle ghost state senere
+        // handle ghost state
+        }
     }
 
     public void disablePowerMode() {
         this.powerMode = false;
         pacManFigure.setFill(YELLOW);
+        for (Ghosts ghost : ghosts) {
+            ghost.normal();
+        }
     }
 
     // holder pacman's orginal posisjon, og etter move forsøk sjekker om man koliderer med en vegg
@@ -140,13 +146,6 @@ public class PacMan {
         if (wallCollision(pacManFigure.getCenterX(), pacManFigure.getCenterY())) {
             pacManFigure.setCenterX(pacManFigure.getCenterX() - offsetX);
             pacManFigure.setCenterY(pacManFigure.getCenterY() - offsetY);
-        } else {
-            // sjekker om pacman går gjennom en tunnel og teleporterer til andre side
-            if (pacManFigure.getCenterX() < TUNNEL_LEFT) {
-                pacManFigure.setCenterX(TUNNEL_RIGHT);
-            } else if (pacManFigure.getCenterX() > TUNNEL_RIGHT) {
-                pacManFigure.setCenterX(TUNNEL_LEFT);
-            }
         }
     }
 
@@ -184,4 +183,25 @@ public class PacMan {
         pacManFigure.setCenterY(y);
     }
 
+    public double getPositionX() {
+        return pacManFigure.getCenterX();
+    }
+
+    public double getPositionY() {
+        return pacManFigure.getCenterY();
+    }
+
+    // getter for liv
+    public int getLives() {
+        return lives;
+    }
+
+    // getter for direction for Pinky
+    public KeyCode getCurrentDirection() {
+        return currentDirection;
+    }
+
+    public Arc getPacManFigure() {
+        return pacManFigure;
+    }
 }

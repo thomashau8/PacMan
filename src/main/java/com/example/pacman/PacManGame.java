@@ -19,17 +19,23 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
+
 public class PacManGame extends Application {
 
     private PacMan pacMan;
     private List<Rectangle> walls = new ArrayList<>(); // skal holde alle veggene i listen
     private List<Collectible> collectibles = new ArrayList<>(); // holder alle collectibles
+    private List<Ghosts> ghosts = new ArrayList<>(); // holder ghosts
     private static final Logger LOGGER = Logger.getLogger(PacManGame.class.getName());
   // hvis tid  private Text highScoreText = new Text("High Score: 0");
     private Text scoreText = new Text("Score: 0");
     private Text livesText = new Text("Lives: 3");
     private int currerntLevel = 1;
     private Text levelText = new Text("Level: 1");
+    private Blinky blinky;
+    private Pinky pinky;
+    private Inky inky;
+    private Clyde clyde;
 
 
     @Override
@@ -50,8 +56,25 @@ public class PacManGame extends Application {
         // gamePane holder game elementene
         Pane gamePane = new Pane();
 
-        pacMan = new PacMan(gamePane, scoreText, livesText);
+        pacMan = new PacMan(gamePane, scoreText, livesText, ghosts);
         pacMan.setWalls(walls);
+
+        blinky = new Blinky(gamePane, walls);
+        gamePane.getChildren().add(blinky.ghostVisual);
+        ghosts.add(blinky);
+
+        pinky = new Pinky(gamePane, walls);
+        gamePane.getChildren().add(pinky.ghostVisual);
+        ghosts.add(pinky);
+
+        inky = new Inky(gamePane, walls, blinky);
+        gamePane.getChildren().add(inky.ghostVisual);
+        ghosts.add(inky);
+
+        clyde = new Clyde(gamePane, walls);
+        gamePane.getChildren().add(clyde.ghostVisual);
+        ghosts.add(clyde);
+
 
         // initierer mappet fra tekst fil
         loadMap(gamePane, "map.txt");
@@ -63,7 +86,7 @@ public class PacManGame extends Application {
         Scene scene = new Scene(root, 735, 880, Color.BLACK);
         scene.setOnKeyPressed(e -> pacMan.setCurrentDirection(e.getCode()));
 
-        gameLoop loop = new gameLoop(this, pacMan, collectibles, gamePane);
+        gameLoop loop = new gameLoop(this, pacMan, collectibles, ghosts, gamePane);
         loop.start();
 
         primaryStage.setTitle("Pac-Man");
@@ -108,10 +131,20 @@ public class PacManGame extends Application {
                             collectibles.add(powerUp); // addes de til listen
                             break;
                         case 'P':
-                            // initierer pacman her
+                            // setter posisjon for reset
                             pacMan.setPosition(x * 32 + 16, y * 32 + 16);
                             break;
-
+                        case 'B':
+                            blinky.setPosition(x * 32 + 16, y * 32 + 16);
+                            break;
+                        case 'K':
+                            pinky.setPosition(x * 32 + 16, y * 32 + 16);
+                            break;
+                        case 'I':
+                            inky.setPosition(x * 32 + 16, y * 32 + 16);;
+                            break;
+                        case 'C':
+                            clyde.setPosition(x * 32 + 16, y * 32 + 16);
                     }
                 }
                 y++;
@@ -120,7 +153,6 @@ public class PacManGame extends Application {
             LOGGER.log(Level.SEVERE, "Error reading file: " + mapFileName, e);
         }
     }
-
 
     public static void main(String[] args) {
         launch(args);
