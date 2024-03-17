@@ -2,17 +2,26 @@ package com.example.pacman;
 
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-
 import java.util.List;
-
 import static javafx.scene.paint.Color.PINK;
-import static javafx.scene.paint.Color.RED;
+
+/** Pinky er en av ghostene, klassen extender superklassen "Ghosts" {@link Ghosts}
+ * Pinky had unik oppførsel fra de andre klassene, det går ut på å predicte movementen til pacman til 4 fliser (grid bokser)
+ * foran pacman
+ */
 
 public class Pinky extends Ghosts {
+    /**
+     * Vi forsøker å tracke siste brukbar move for å ikke bli stuck
+     */
     private KeyCode lastSuccessfulMove = KeyCode.UP; // vi initaliserer med en random direction
 
+    /**
+     *
+     * @param gamePane panet som blir brukt til å visualisere elementene
+     * @param walls list av vegger for collision detection
+     */
     public Pinky(Pane gamePane, List<Rectangle> walls) {
         super(gamePane, walls);
         createVisual();
@@ -24,7 +33,13 @@ public class Pinky extends Ghosts {
         ghostVisual.setFill(PINK); // setter pinky til pink
     }
 
-    // chase logikken til pinky,
+    /**
+     * definerer chase logikken til Pinky som spesifisert på toppen av klassen
+     *
+     * @param pacManX X coordinatene av Pacman's posisjon
+     * @param pacManY Y coordinatene av pacman's posisjon
+     * @param pacManDirection current direction pacman beveger seg i
+     */
     @Override
     public void chaseImp(double pacManX, double pacManY, KeyCode pacManDirection) { // målet er å sette pinky foran pacman
         // forutse pacman's bevegelse
@@ -47,11 +62,12 @@ public class Pinky extends Ghosts {
                 break;
         }
 
-        // beveger pinky til forutsitt posisjon
+        /**
+         * beveger pinky til forutsitt posisjon
+         */
         double deltaX = targetX - ghostVisual.getLayoutX();
         double deltaY = targetY - ghostVisual.getLayoutY();
         KeyCode desiredDirection = getDesiredDirection(deltaX, deltaY);
-
 
 
         if (!tryMove(desiredDirection)) {
@@ -71,6 +87,6 @@ public class Pinky extends Ghosts {
         super.normal();
         ghostVisual.setFill(PINK);
         ghostVisual.setOpacity(1.0);
-     //   speed = 1.0;
+        //   speed = 1.0;
     }
 }

@@ -18,8 +18,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
-
+/**
+ * Dette er main klassen for pacman, det er her vi setter opp game environmentet, mappet, pacman, ghosts, collectibles
+ * Jeg vil bare notere det skulle bli gjort på en bedre måte å instantisere ghostene, men fikk en del problemer pga oppsett
+ * og hadde ikke tid til å justere det for å kunne levere i tide, så det ble bare sånn.
+ */
 public class PacManGame extends Application {
 
     private PacMan pacMan;
@@ -30,14 +33,17 @@ public class PacManGame extends Application {
   // hvis tid  private Text highScoreText = new Text("High Score: 0");
     private Text scoreText = new Text("Score: 0");
     private Text livesText = new Text("Lives: 3");
-    private int currerntLevel = 1;
-    private Text levelText = new Text("Level: 1");
-    private Blinky blinky;
+    private int currerntLevel = 1; // rakk ikke å implementere
+    private Text levelText = new Text("Level: 1"); // ikke implementert
+    private Blinky blinky; // instanser for ghost
     private Pinky pinky;
     private Inky inky;
     private Clyde clyde;
 
-
+    /**
+     * instansierer UI, ghosts osv.
+     * @param primaryStage
+     */
     @Override
     public void start(Stage primaryStage) {
         // Hbox for top layer
@@ -49,7 +55,7 @@ public class PacManGame extends Application {
 
 
         // Styler HUD
-     //   highScoreText.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+     // highScoreText.setFont(Font.font("Arial", FontWeight.BOLD, 14));
         scoreText.setFont(Font.font("Arial", FontWeight.BOLD, 14));
         livesText.setFont(Font.font("Arial", FontWeight.BOLD, 14));
 
@@ -95,6 +101,11 @@ public class PacManGame extends Application {
 
     }
 
+    /**
+     * Loader mappet og layouten fra en tekst fil, inkluderer også ghosts spawnpoint, pacman, points osv. spillet er ment for en størrelse på "735, 880"
+     * @param gamePane dette er Pane't som adder maze elementene.
+     * @param mapFileName Navnet på filen som holder map layout
+     */
     public void loadMap(Pane gamePane, String mapFileName) {
         // åpner map filen
         InputStream is = getClass().getClassLoader().getResourceAsStream(mapFileName);
@@ -147,7 +158,7 @@ public class PacManGame extends Application {
                             clyde.setPosition(x * 32 + 16, y * 32 + 16);
                     }
                 }
-                y++;
+                y++; // leser neste linje
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error reading file: " + mapFileName, e);

@@ -11,7 +11,7 @@ import static javafx.scene.paint.Color.RED;
 
 public class Blinky extends Ghosts {
 
-    private boolean cornered = false; // brukes til når pacman er stuck i en corner
+    private boolean cornered = false;
 
 
     public Blinky(Pane gamePane, List<Rectangle> walls) {
@@ -30,7 +30,12 @@ public class Blinky extends Ghosts {
         this.ghostVisual.setLayoutY(y);
     }
 
-    // main algoritme logikken for å følge etter pacman
+    /**
+     * main algoritme logikken for å følge etter pacman, Blinky er ganske straight forward, bare chase til han får tak i Pacman
+     * @param pacManX x koordinatene til pacman
+     * @param pacManY y koordinatene til pacman
+     * @param pacManDirection retningen til pacman
+     */
     @Override
     public void chaseImp(double pacManX, double pacManY, KeyCode pacManDirection) {
 

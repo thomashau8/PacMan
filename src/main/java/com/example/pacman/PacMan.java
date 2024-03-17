@@ -16,6 +16,10 @@ import javafx.util.Duration;
 import java.util.List;
 import static javafx.scene.paint.Color.*;
 
+/**
+ * Representerer pacman karakteren i spillet, her skjer alt av movement handling collision deteksjon scores,
+ * liv, powermode funksjonalitet osv
+ */
 public class PacMan {
     // byttet fra circle til arc for å animere pacman, men tror ikke jeg rekker det
     private List<Ghosts> ghosts;
@@ -32,7 +36,13 @@ public class PacMan {
     // metode for å hjelpe spiller å turne selv om tasten blir trykket ved en vegg
     private Timeline powerModeTimer;
 
-
+    /**
+     * konstruktør for pacman med spesifikke UI elementer og en liste med ghosts
+     * @param gamePane adder pacman til panet
+     * @param scoreText UI tekst for å visuelt displaye score
+     * @param livesText UI tekst for å visuelt displaye liv
+     * @param ghosts holder en liste av ghosts
+     */
     public PacMan(Pane gamePane, Text scoreText, Text livesText, List<Ghosts> ghosts) {
         this.scoreText = scoreText;
         this.livesText = livesText;
@@ -50,12 +60,20 @@ public class PacMan {
         updateLivesDisplay();
     }
 
-    // gir PacMan klassen tilgang til alle veggene på mappet for å sjekke collision
+    /**
+     * gir PacMan klassen tilgang til alle veggene på mappet for å sjekke collision
+     * @param walls liste av alle veggene i spillet
+     */
     public void setWalls(List<Rectangle> walls) {
         this.walls = walls;
     }
 
-    // sjekker om pacman's bounding box intersects med bounding boxen til veggene
+    /**
+     * sjekker om pacman's bounding box intersects med bounding boxen til veggene
+     * @param nextX neste X koordinaten for pacman
+     * @param nextY neste Y koordinaten for pacman
+     * @return returnerer true hvis det er en kollisjon, ellers false
+     */
     public boolean wallCollision(double nextX, double nextY) {
         Bounds potentialBounds = new BoundingBox(
                 nextX - pacManFigure.getRadiusX(),
@@ -72,27 +90,33 @@ public class PacMan {
         return false;
     }
 
-    // metode for å sette score
     public void addScore(int points) {
         this.score += points;
         updateScoreDisplay();
     }
 
-    // metode for å tracke liv
     public void loseLife() {
         this.lives--;
         updateLivesDisplay();
     }
 
+    /**
+     * oppdaterer score på UI'en
+     */
     private void updateScoreDisplay() {
         Platform.runLater(() -> scoreText.setText("Score: " + score));
     }
 
+    /**
+     * oppdaterer UI for liv
+     */
     private void updateLivesDisplay() {
         Platform.runLater(() -> livesText.setText("Lives: " + lives));
     }
 
-    // metode for powermode
+    /**
+     *  metode for powermode og gjør at pacman kan jakte på ghosts
+     */
     public void enablePowerMode() {
         this.powerMode = true;
         pacManFigure.setFill(PURPLE);
@@ -108,6 +132,9 @@ public class PacMan {
         }
     }
 
+    /**
+     * skrur av powermode
+     */
     public void disablePowerMode() {
         this.powerMode = false;
         pacManFigure.setFill(YELLOW);
@@ -116,6 +143,10 @@ public class PacMan {
         }
     }
 
+    /**
+     * beveger pacman rundt i spillet via user input
+     * @param currentSpeed hastigheten til pacman
+     */
     // holder pacman's orginal posisjon, og etter move forsøk sjekker om man koliderer med en vegg
     public void move(double currentSpeed) {
         // sjekker om vi kan snu til valgt direction
@@ -149,6 +180,11 @@ public class PacMan {
         }
     }
 
+    /**
+     * sjekker om pacman kan bevege seg i retningen man presser basert på en lookahead posisjon
+     * @param direction direksjonen spilleren vil snu
+     * @return true hvis pacman kan snu, ellers false
+     */
     public boolean canTurn(KeyCode direction) {
         //kalkulerer lookahead posisjon basert på desired direction
         double lookaheadX = pacManFigure.getCenterX();
@@ -169,19 +205,27 @@ public class PacMan {
         return !wallCollision(lookaheadX, lookaheadY);
     }
 
-    // setter ønsket direksjon for å turne pacman
+    /**
+     * @param newDirection setter ønsket direksjon for å turne pacman
+     */
     public void setCurrentDirection(KeyCode newDirection) {
         this.desiredDirection = newDirection;
     }
-    // gir bounds til gameLoop for sjekk
+
     public Bounds getBounds() {
         return pacManFigure.getBoundsInParent();
     }
 
+    /**
+     * setter posisjonen til pacman på mappet
+     * @param x x koordinates for neste posisjon
+     * @param y y koordinatene for neste posisjon
+     */
     public void setPosition(double x, double y) {
         pacManFigure.setCenterX(x);
         pacManFigure.setCenterY(y);
     }
+
 
     public double getPositionX() {
         return pacManFigure.getCenterX();
@@ -191,12 +235,10 @@ public class PacMan {
         return pacManFigure.getCenterY();
     }
 
-    // getter for liv
     public int getLives() {
         return lives;
     }
 
-    // getter for direction for Pinky
     public KeyCode getCurrentDirection() {
         return currentDirection;
     }
